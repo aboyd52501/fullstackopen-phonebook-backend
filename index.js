@@ -28,6 +28,14 @@ app.get('/', (req, res) => {
     res.send("I am root");
 });
 
+app.get('/info', (req, res) => {
+    res.send(`
+        Phonebook has info for ${persons.length} people
+        <br>
+        ${new Date()}
+    `);
+});
+
 app.get('/api/persons', (req, res) => {
     res.json(persons);
 });
