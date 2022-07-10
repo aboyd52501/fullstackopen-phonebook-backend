@@ -24,8 +24,11 @@ let persons = [
     },
 ]
 
+app.use(express.json());
+
 app.all(/.*/, (req, res, next) => {
     console.log(`${req.method} ${req.url}`);
+    if(req.body) console.log(req.body);
     next();
 });
 
@@ -66,6 +69,17 @@ app.delete('/api/persons/:id', (req, res) => {
         persons = persons.filter(p => p.id !== id);
         res.status(204).end();
     }
+});
+
+const getID = () => Math.floor(Math.random()*Number.MAX_SAFE_INTEGER);
+
+app.post('/api/persons', (req, res) => {
+    const id = getID();
+    const newPerson = req.body;
+    newPerson.id = id;
+    persons.push(newPerson);
+
+    res.json(newPerson);
 });
 
 const PORT = 3001;
