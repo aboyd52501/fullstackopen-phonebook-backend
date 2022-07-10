@@ -28,8 +28,15 @@ let persons = [
 
 app.use(express.json());
 
+const bodyToken = morgan.token('body', (req, res) => {
+    if (Object.keys(req.body).length !== 0)
+        return JSON.stringify(req.body);
+    else
+        return '';
+});
 
-app.use(morgan('tiny'));
+const logger = morgan(':method :url :status :res[content-length] - :response-time ms :body');
+app.use(logger);
 
 app.get('/', (req, res) => {
     res.send("I am root");
