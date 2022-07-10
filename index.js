@@ -73,13 +73,33 @@ app.delete('/api/persons/:id', (req, res) => {
 
 const getID = () => Math.floor(Math.random()*Number.MAX_SAFE_INTEGER);
 
+const isInvalidRequest = req => {
+    if (!req.body.name)
+        return "Missing name"
+    else if (!req.body.number)
+        return "Missing number"
+    else if (persons.find(person => person.name === req.body.name))
+        return "Name already exists"
+    else
+        return false;
+}
+
 app.post('/api/persons', (req, res) => {
     const id = getID();
     const newPerson = req.body;
     newPerson.id = id;
-    persons.push(newPerson);
 
-    res.json(newPerson);
+    const isInvalid = isInvalidRequest(req);
+
+    if (!isInvalid) {
+        persons.push(newPerson);
+        res.json(newPerson);
+    }
+    else {
+        res
+            .status(400)
+            .json({ error: isInvalid });
+    }
 });
 
 const PORT = 3001;

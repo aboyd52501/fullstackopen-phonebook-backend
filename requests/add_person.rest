@@ -5,3 +5,19 @@ Content-Type: application/json
     "name": "testificate",
     "number": "1234321"
 }
+
+### bad request (no name)
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "number": "122344321"
+}
+
+### bad request (no number)
+POST http://localhost:3001/api/persons
+Content-Type: application/json
+
+{
+    "name": "phoneless"
+}
