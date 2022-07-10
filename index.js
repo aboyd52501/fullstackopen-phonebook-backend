@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 
+const morgan = require('morgan');
+
 let persons = [
     {
         "id": 1,
@@ -26,11 +28,8 @@ let persons = [
 
 app.use(express.json());
 
-app.all(/.*/, (req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    if(req.body) console.log(req.body);
-    next();
-});
+
+app.use(morgan('tiny'));
 
 app.get('/', (req, res) => {
     res.send("I am root");
@@ -61,11 +60,11 @@ app.delete('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id);
     const person = persons.find(person => person.id === id);
     if (!person) {
-        console.log(`Attempted deletion of nonexistent person with ID ${id}`);
+        // console.log(`Attempted deletion of nonexistent person with ID ${id}`);
         res.status(404).end();
     }
     else {
-        console.log(`Deleting person with ID ${id}`);
+        // console.log(`Deleting person with ID ${id}`);
         persons = persons.filter(p => p.id !== id);
         res.status(204).end();
     }
