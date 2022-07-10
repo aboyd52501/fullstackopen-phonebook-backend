@@ -1,0 +1,27 @@
+{
+  "name": "fullstackopen-phonebook-backend",
+  "version": "1.0.0",
+  "description": "Backend for the phonebook application",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aboyd52501/fullstackopen-phonebook-backend.git"
+  },
+  "author": "aboyd52501",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aboyd52501/fullstackopen-phonebook-backend/issues"
+  },
+  "homepage": "https://github.com/aboyd52501/fullstackopen-phonebook-backend#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
