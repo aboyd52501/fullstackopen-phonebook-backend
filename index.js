@@ -3,6 +3,8 @@ const app = express();
 
 const morgan = require('morgan');
 
+const cors = require('cors');
+
 let persons = [
     {
         "id": 1,
@@ -25,6 +27,8 @@ let persons = [
         "number": "39-23-6423122"
     },
 ]
+
+app.use(cors())
 
 app.use(express.json());
 
