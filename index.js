@@ -103,6 +103,16 @@ app.post('/api/persons', (req, res) => {
     }
 });
 
+app.put('/api/persons/:id', (req, res, next) => {
+    const { number } = req.body;
+    const id = req.params.id;
+
+    Person
+        .findByIdAndUpdate(id, { number }, { new: true })
+        .then(person => res.json(person))
+        .catch(next);
+});
+
 const errorHandler = (error, req, res, next) => {
     console.error(error.message);
 
