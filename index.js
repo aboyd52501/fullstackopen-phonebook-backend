@@ -7,29 +7,6 @@ const morgan = require('morgan');
 
 const cors = require('cors');
 
-// let persons = [
-//     {
-//         "id": 1,
-//         "name": "Arto Hellas", 
-//         "number": "040-123456"
-//     },
-//     {
-//         "id": 2,
-//         "name": "Ada Lovelace", 
-//         "number": "39-44-5323523"
-//     },
-//     {
-//         "id": 3,
-//         "name": "Dan Abramov", 
-//         "number": "12-43-234345"
-//     },
-//     {
-//         "id": 4,
-//         "name": "Mary Poppendieck", 
-//         "number": "39-23-6423122"
-//     },
-// ]
-
 app.use(cors());
 
 app.use(express.static('build'));
@@ -50,13 +27,17 @@ app.get('/', (req, res) => {
     res.send("I am root");
 });
 
-// app.get('/info', (req, res) => {
-//     res.send(`
-//         Phonebook has info for ${persons.length} people
-//         <br>
-//         ${new Date()}
-//     `);
-// });
+app.get('/info', (req, res) => {
+    Person
+        .find({})
+        .then(persons => {
+            res.send(`
+                Phonebook has info for ${persons.length} people
+                <br>
+                ${new Date()}
+            `);
+        });
+});
 
 app.get('/api/persons', (req, res) => {
     Person
@@ -66,7 +47,7 @@ app.get('/api/persons', (req, res) => {
         });
 });
 
-app.get('/api/persons/:id', (req, res) => {
+app.get('/api/persons/:id', (req, res, next) => {
     Person
         .findById(req.params.id)
         .then(person => {
@@ -78,43 +59,32 @@ app.get('/api/persons/:id', (req, res) => {
                 res.status(404).json({ error: 'Person not found' });
             }
         })
-        .catch(error => {
-            console.error(error);
-            res.status(400).json({ error: 'Malformed id' });
-        });
+        .catch(next);
 });
 
-// app.delete('/api/persons/:id', (req, res) => {
-//     const id = Number(req.params.id);
-//     const person = persons.find(person => person.id === id);
-//     if (!person) {
-//         // console.log(`Attempted deletion of nonexistent person with ID ${id}`);
-//         res.status(404).end();
-//     }
-//     else {
-//         // console.log(`Deleting person with ID ${id}`);
-//         persons = persons.filter(p => p.id !== id);
-//         res.status(204).end();
-//     }
-// });
+app.delete('/api/persons/:id', (req, res, next) => {
+    Person
+        .findByIdAndRemove(req.params.id)
+        .then(result => {
+            if (result)
+                return res.status(204).end()
+            else
+                return res.status(404).json({ error: 'Person not found' });
+        })
+        .catch(next)
+});
 
-
-// const isInvalidRequest = req => {
-//     if (!req.body.name)
-//         return "Missing name"
-//     else if (!req.body.number)
-//         return "Missing number"
-//     else if (persons.find(person => person.name === req.body.name))
-//         return "Name already exists"
-//     else
-//         return false;
-// }
 
 app.post('/api/persons', (req, res) => {
-    const { name, number } = req.body;
+    let { name, number } = req.body;
+
+    // Verify that the request is valid
+    name = name.match(/^[a-zA-Z '-]{1,64}$/) ? name : '';
+    number = number.match(/^[\d-]{1,32}$/) ? number : '';
 
     if (!name || !number) {
-        res.status(400).json({ error: 'Name or number missing' });
+        if (!name) res.status(400).json({ error: "Invalid name" });
+        else res.status(400).json({ error: "Invalid number" });
     }
     else {
 
@@ -132,6 +102,18 @@ app.post('/api/persons', (req, res) => {
             });
     }
 });
+
+const errorHandler = (error, req, res, next) => {
+    console.error(error.message);
+
+    if (error.name === 'CastError')
+        return res.status(400).send({ error: 'Malformed ID' });
+    else if (error.name === '')
+
+    next(error);
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
