@@ -1,13 +1,7 @@
 require("dotenv").config()
 const mongoose = require('mongoose');
 
-if (process.argv.length < 3) {
-    console.log('Please provide the password as an argument: node mongo.js <password>');
-    process.exit(1);
-}
-
-const password = process.argv[2];
-const URI = process.env.MONGODB_URI_NOPASS.replace('<pass>', password);;
+const URI = process.env.MONGODB_URI;
 
 const personSchema = new mongoose.Schema({
     name: String,
@@ -15,48 +9,47 @@ const personSchema = new mongoose.Schema({
     date: Date,
 });
 
+personSchema.set('toJSON', {
+    transform: (document, returnedObject) => {
+        returnedObject.id = returnedObject._id.toString();
+        delete returnedObject._id;
+        delete returnedObject.__v;
+    }
+});
+
 const Person = mongoose.model('Person', personSchema);
 
-const mongooseOperation = callback => (
-    mongoose
-        .connect(URI)
-        .then(() => {
-            // console.log('Connected to MongoDB.');
-            // console.log(`Running callback: ${callback.name || callback.toString()}`);
-            return callback();
-        })
-        .then(result => {
-            // console.log("Closing connection to MongoDB.");
-            mongoose.connection.close();
-            return result;
-        })
-        .catch(console.error)
-);
+mongoose.connect(URI)
+    .then(() => console.log('Connected to MongoDB.'))
+    .catch(error => console.error('Error connecting to MongoDB:', error));
 
-const addPerson = (name, number) => {
-    const person = new Person({
-        name: name,
-        number: number,
-        date: new Date(),
-    });
+// // runs a callback, closes the connection, and returns the result of the callback.
+// const mongooseOperation = callback => (
+//     mongoose
+//         .connect(URI)
+//         .then(() => {
+//             // console.log('Connected to MongoDB.');
+//             // console.log(`Running callback: ${callback.name || callback.toString()}`);
+//             return callback();
+//         })
+//         .then(result => {
+//             // console.log("Closing connection to MongoDB.");
+//             mongoose.connection.close();
+//             return result;
+//         })
+//         .catch(console.error)
+// );
 
-    return mongooseOperation(() => person.save());
-};
+// const addPerson = (name, number) => {
+//     const person = new Person({
+//         name: name,
+//         number: number,
+//         date: new Date(),
+//     });
 
-const getPeople = params => mongooseOperation(() => Person.find(params || {}));
+//     return mongooseOperation(() => person.save());
+// };
 
-module.exports = { Person, addPerson, getPeople };
+// const getPeople = params => mongooseOperation(() => Person.find(params || {}));
 
-switch (process.argv.length) {
-    case 5:
-        addPerson(process.argv[3], process.argv[4])
-            .then(person => console.log(`added ${person.name} ${person.number} to phonebook DB`));
-        break;
-    case 3:
-        getPeople()
-            .then(people => people.forEach(person => console.log(person.name, person.number)));
-        break;
-    default:
-        console.error(`Invalid number of arguments: ${process.argv.length}`);
-        process.exit(1);
-}
+module.exports = { Person };
