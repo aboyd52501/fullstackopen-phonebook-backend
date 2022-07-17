@@ -75,32 +75,19 @@ app.delete('/api/persons/:id', (req, res, next) => {
 });
 
 
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
     let { name, number } = req.body;
 
-    // Verify that the request is valid
-    name = name.match(/^[a-zA-Z '-]{1,64}$/) ? name : '';
-    number = number.match(/^[\d-]{1,32}$/) ? number : '';
+    const newPerson = new Person({
+        name, number, date: new Date(),
+    });
 
-    if (!name || !number) {
-        if (!name) res.status(400).json({ error: "Invalid name" });
-        else res.status(400).json({ error: "Invalid number" });
-    }
-    else {
-
-        const newPerson = new Person({
-            name, number
-        });
-
-        newPerson
-            .save()
-            .then(person => {
-                res.json(person);
-            })
-            .catch(error => {
-                res.status(400).send(error);
-            });
-    }
+    newPerson
+        .save()
+        .then(person => {
+            res.json(person);
+        })
+        .catch(next);
 });
 
 app.put('/api/persons/:id', (req, res, next) => {
@@ -108,18 +95,23 @@ app.put('/api/persons/:id', (req, res, next) => {
     const id = req.params.id;
 
     Person
-        .findByIdAndUpdate(id, { number }, { new: true })
+        .findByIdAndUpdate(
+            id,
+            { number },
+            { new: true, runValidators: true, context: 'query' }
+        )
         .then(person => res.json(person))
         .catch(next);
 });
 
 const errorHandler = (error, req, res, next) => {
-    console.error(error.message);
+    console.error(error.name, error.message);
 
     if (error.name === 'CastError')
         return res.status(400).send({ error: 'Malformed ID' });
-    else if (error.name === '')
-
+    else if (error.name === 'ValidationError')
+        return res.status(400).json({ error: error.message });
+    
     next(error);
 }
 

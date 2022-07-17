@@ -3,10 +3,25 @@ const mongoose = require('mongoose');
 
 const URI = process.env.MONGODB_URI;
 
+const personNameRegex = /^[a-zA-Z '-]{1,64}$/;
+const personNumberRegex = /^[\d-]{1,32}$/;
+
 const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-    date: Date,
+    name: {
+        type: String,
+        required: true,
+        minlength: 3,
+        match: personNameRegex,
+    },
+    number: {
+        type: String,
+        required: true,
+        match: personNumberRegex,
+    },
+    date: {
+        type: Date,
+        required: true,
+    },
 });
 
 personSchema.set('toJSON', {
