@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const URI = process.env.MONGODB_URI;
 
 const personNameRegex = /^[a-zA-Z '-]{1,64}$/;
-const personNumberRegex = /^[\d-]{1,32}$/;
+const personNumberRegex = /^(\d{2,3}-)?\d{1,64}$/;
 
 const personSchema = new mongoose.Schema({
     name: {
@@ -16,7 +16,11 @@ const personSchema = new mongoose.Schema({
     number: {
         type: String,
         required: true,
-        match: personNumberRegex,
+        minlength: 8,
+        validate: {
+            validator: num => personNumberRegex.test(num),
+            message: props => `${props.value} is not a valid phone number`,
+        },
     },
     date: {
         type: Date,

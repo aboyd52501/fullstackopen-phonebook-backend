@@ -39,12 +39,13 @@ app.get('/info', (req, res) => {
         });
 });
 
-app.get('/api/persons', (req, res) => {
+app.get('/api/persons', (req, res, next) => {
     Person
         .find({})
         .then(people => {
             res.json(people);
-        });
+        })
+        .catch(next);
 });
 
 app.get('/api/persons/:id', (req, res, next) => {
@@ -78,14 +79,25 @@ app.delete('/api/persons/:id', (req, res, next) => {
 app.post('/api/persons', (req, res, next) => {
     let { name, number } = req.body;
 
-    const newPerson = new Person({
-        name, number, date: new Date(),
-    });
+    Person
+        .find({ name })
+        .then(persons => {
 
-    newPerson
-        .save()
-        .then(person => {
-            res.json(person);
+            if (persons.length) {
+                return res.status(400).json({ error: 'Name must be unique' });
+            }
+            else {
+                const newPerson = new Person({
+                    name, number, date: new Date(),
+                });
+
+                newPerson
+                    .save()
+                    .then(person => {
+                        res.json(person);
+                    })
+                    .catch(next);
+            }
         })
         .catch(next);
 });
