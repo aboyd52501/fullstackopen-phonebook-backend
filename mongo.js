@@ -1,10 +1,10 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+require('dotenv').config()
+const mongoose = require('mongoose')
 
-const URI = process.env.MONGODB_URI;
+const URI = process.env.MONGODB_URI
 
-const personNameRegex = /^[a-zA-Z '-]{1,64}$/;
-const personNumberRegex = /^(\d{2,3}-)?\d{1,64}$/;
+const personNameRegex = /^[a-zA-Z '-]{1,64}$/
+const personNumberRegex = /^(\d{2,3}-)?\d{1,64}$/
 
 const personSchema = new mongoose.Schema({
   name: {
@@ -26,21 +26,21 @@ const personSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-});
+})
 
 personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
   },
-});
+})
 
-const Person = mongoose.model('Person', personSchema);
+const Person = mongoose.model('Person', personSchema)
 
 mongoose.connect(URI)
   .then(() => console.log('Connected to MongoDB.'))
-  .catch(error => console.error('Error connecting to MongoDB:', error));
+  .catch(error => console.error('Error connecting to MongoDB:', error))
 
 // // runs a callback, closes the connection, and returns the result of the callback.
 // const mongooseOperation = callback => (
@@ -71,4 +71,4 @@ mongoose.connect(URI)
 
 // const getPeople = params => mongooseOperation(() => Person.find(params || {}));
 
-module.exports = { Person };
+module.exports = { Person }

@@ -23,7 +23,7 @@ module.exports = {
     ],
     'semi': [
       'error',
-      'always',
+      'never',
     ],
     'eqeqeq': 'error',
     'no-trailing-spaces': 'error',
@@ -36,5 +36,5 @@ module.exports = {
     'no-console': 0,
     'comma-dangle': ['error', 'always-multiline'],
   },
-};
+}
 
