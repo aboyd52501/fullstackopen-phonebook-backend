@@ -35,6 +35,15 @@ module.exports = {
     ],
     'no-console': 0,
     'comma-dangle': ['error', 'always-multiline'],
+    'max-len': [
+      'error',
+      {
+        'code': 120,
+        'ignoreUrls': true,
+        'ignoreStrings': true,
+        'ignoreTemplateLiterals': true,
+        'ignoreComments': true,
+      }],
   },
 }
 
